@@ -22,4 +22,4 @@ void bootstrap();
 
 // create CRUD for all entity's
 // grade report for students
-// create entity: teacher
+// create entity: teacher - done
