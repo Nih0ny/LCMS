@@ -11,7 +11,6 @@ import { GradeCrudModule } from './grade-crud/grade-crud.module';
 import { CourseCrudModule } from './course-crud/course-crud.module';
 import { UserModule } from './user/user.module';
 import { CourseModule } from './course/course.module';
-import { GradeReportController } from './grade-report/grade-report.controller';
 import { GradeReportModule } from './grade-report/grade-report.module';
 
 @Module({
@@ -32,7 +31,7 @@ import { GradeReportModule } from './grade-report/grade-report.module';
     CourseModule,
     GradeReportModule,
   ],
-  controllers: [AppController, GradeReportController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
