@@ -1,26 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGradeCrudDto } from './dto/create-grade-crud.dto';
 import { UpdateGradeCrudDto } from './dto/update-grade-crud.dto';
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Grade } from '../schemas/grade.schema';
 
 @Injectable()
 export class GradeCrudService {
-  create(createGradeCrudDto: CreateGradeCrudDto) {
-    return 'This action adds a new gradeCrud';
+  constructor(
+    @InjectModel(Grade.name) private readonly gradeModel: Model<Grade>,
+  ) {}
+
+  async create(createGradeCrudDto: CreateGradeCrudDto): Promise<Grade> {
+    const createdGrade = new this.gradeModel(createGradeCrudDto);
+    return await createdGrade.save();
   }
 
-  findAll() {
-    return `This action returns all gradeCrud`;
+  async findAll(): Promise<Grade[]> {
+    return await this.gradeModel
+      .find()
+      .populate('user')
+      .populate('course')
+      .exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} gradeCrud`;
+  async findOne(id: string): Promise<Grade> {
+    const grade = await this.gradeModel
+      .findById(id)
+      .populate('user')
+      .populate('course')
+      .exec();
+    if (!grade) {
+      throw new NotFoundException(`Grade with ID ${id} not found.`);
+    }
+    return grade;
   }
 
-  update(id: number, updateGradeCrudDto: UpdateGradeCrudDto) {
-    return `This action updates a #${id} gradeCrud`;
+  async update(
+    id: string,
+    updateGradeCrudDto: UpdateGradeCrudDto,
+  ): Promise<Grade> {
+    const updatedGrade = await this.gradeModel
+      .findByIdAndUpdate(id, updateGradeCrudDto, { new: true })
+      .exec();
+
+    if (!updatedGrade) {
+      throw new NotFoundException(`Grade with ID ${id} not found.`);
+    }
+
+    return updatedGrade;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} gradeCrud`;
+  async remove(id: string): Promise<Grade> {
+    const deletedGrade = await this.gradeModel.findByIdAndDelete(id).exec();
+    if (!deletedGrade) {
+      throw new NotFoundException(`Grade with ID ${id} not found.`);
+    }
+    return deletedGrade;
   }
 }
